@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<robot name="rv2fr" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!--
+    gz sim overlay for the Mitsubishi RV-2FR.
+
+    Reuses melfa_description's geometry/kinematics macro (rv2fr_macro.xacro)
+    as-is, but does NOT include melfa_description's ros2_control/rv2fr.hardware.xacro
+    (that file targets the real driver via ign_ros2_control/IgnitionSystem, which is
+    old Ignition-era naming from before the Gazebo rename, see docs/decisions.md).
+    Instead this file defines its own <ros2_control> block using gz_ros2_control's
+    GazeboSimSystem plugin, which is the Jazzy/Harmonic-supported equivalent.
+  -->
+
+  <xacro:arg name="prefix" default=""/>
+  <xacro:property name="prefix" value="$(arg prefix)"/>
+
+  <xacro:include filename="$(find melfa_description)/urdf/rv2fr/rv2fr_macro.xacro"/>
+  <xacro:include filename="$(find rv2fr_gz_bringup)/urdf/eye_to_hand_camera.xacro"/>
+
+  <link name="world"/>
+
+  <xacro:rv2fr parent="world" prefix="${prefix}">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:rv2fr>
+
+  <!-- Eye-to-hand camera: fixed in the world, looking down/in at the workspace
+       in front of the robot base, NOT attached to the end effector. -->
+  <xacro:eye_to_hand_camera parent_link="world" name="eye_to_hand_camera"
+    xyz="0.9 0.0 0.9" rpy="0 0.6109 3.14159"/>
+
+  <ros2_control name="rv2fr_gz_system" type="system">
+    <hardware>
+      <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+    </hardware>
+    <joint name="${prefix}rv2fr_joint_1">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="${prefix}rv2fr_joint_2">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="${prefix}rv2fr_joint_3">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="${prefix}rv2fr_joint_4">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="${prefix}rv2fr_joint_5">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="${prefix}rv2fr_joint_6">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+  </ros2_control>
+
+  <gazebo>
+    <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+      <parameters>$(find rv2fr_gz_bringup)/config/rv2fr_gz_controllers.yaml</parameters>
+      <!-- This is plugin-wide, applying to every position-interface joint including
+           the arm, not just the gripper. A persistent, visible arm-at-rest
+           vibration/wobble (the user's main complaint) was root-caused this session,
+           NOT to this gain (extensively tested across gain=1/10/20/50/100 with no
+           change in wobble amplitude once tested correctly) but to
+           controller_manager's update_rate being 10x slower than gz sim's physics
+           step, see rv2fr_gz_controllers.yaml, fixed there. With that fixed, the
+           end effector is stable to within ~1-2mm at rest, tested at this gain value
+           and confirmed the arm tolerates it fine (no jitter). 20 is not a
+           safety-critical tuned value at this point, just a reasonable middle value
+           carried forward from before the real fix was found; see docs/decisions.md
+           for the full investigation. -->
+      <position_proportional_gain>20</position_proportional_gain>
+    </plugin>
+  </gazebo>
+
+</robot>

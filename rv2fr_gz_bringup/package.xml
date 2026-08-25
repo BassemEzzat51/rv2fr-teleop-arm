@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>rv2fr_gz_bringup</name>
+  <version>0.1.0</version>
+  <description>gz sim (Gazebo Harmonic) integration for the Mitsubishi RV-2FR: xacro overlay with gz_ros2_control, fixed eye-to-hand camera, world files, and launch files to spawn and control the arm in simulation.</description>
+  <maintainer email="bassemezzat165@gmail.com">bassem</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>melfa_description</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>joint_state_broadcaster</exec_depend>
+  <exec_depend>joint_trajectory_controller</exec_depend>
+  <exec_depend>forward_command_controller</exec_depend>
+  <exec_depend>controller_manager</exec_depend>
+  <exec_depend>gz_ros2_control</exec_depend>
+  <exec_depend>ros_gz_sim</exec_depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
+  <exec_depend>ros_gz_image</exec_depend>
+  <exec_depend>melfa_rv2fr_moveit_config</exec_depend>
+  <exec_depend>moveit_configs_utils</exec_depend>
+  <exec_depend>moveit_ros_move_group</exec_depend>
+  <exec_depend>moveit_servo</exec_depend>
+  <exec_depend>launch_param_builder</exec_depend>
+  <!-- For rv2fr_full_system.launch.py, which composes this package's own sim/moveit
+       launch files with these sibling packages' nodes into one entry point. -->
+  <exec_depend>rv2fr_perception</exec_depend>
+  <exec_depend>rv2fr_teleop_gui</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

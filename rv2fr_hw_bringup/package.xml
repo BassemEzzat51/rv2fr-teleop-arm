@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>rv2fr_hw_bringup</name>
+  <version>0.1.0</version>
+  <description>Single-launch entry point for the RV-2FR's MoveIt2 + RViz2 against a choice of hardware backend: melfa_ros2_driver's fake-hardware/real-hardware path, or rv2fr_gz_bringup's Gazebo simulation (use_gz_sim:=true) -- for validating motion planning, collision checking, and reachability without needing RT ToolBox3.</description>
+  <maintainer email="bassemezzat165@gmail.com">bassem</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>melfa_bringup</exec_depend>
+  <exec_depend>melfa_rv2fr_moveit_config</exec_depend>
+  <exec_depend>rv2fr_gz_bringup</exec_depend>
+  <exec_depend>rv2fr_teleop_gui</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

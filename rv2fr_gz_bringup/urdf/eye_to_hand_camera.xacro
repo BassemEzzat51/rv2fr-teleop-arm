@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!--
+    Fixed eye-to-hand RGB-D camera, simulating a RealSense D435-like sensor.
+    Mounted externally in the world (NOT on the robot), looking down at the
+    robot's workspace. gz sim's rgbd_camera sensor type publishes color,
+    depth, points, and camera_info together under one <topic> namespace.
+  -->
+  <xacro:macro name="eye_to_hand_camera" params="parent_link name:=eye_to_hand_camera xyz:='0.9 0.0 0.9' rpy:='0 0.6109 3.14159'">
+
+    <link name="${name}_mount"/>
+
+    <joint name="${parent_link}_to_${name}_mount" type="fixed">
+      <parent link="${parent_link}"/>
+      <child link="${name}_mount"/>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+    </joint>
+
+    <link name="${name}_link">
+      <visual>
+        <geometry>
+          <box size="0.025 0.09 0.025"/>
+        </geometry>
+        <material name="camera_black">
+          <color rgba="0.05 0.05 0.05 1.0"/>
+        </material>
+      </visual>
+      <inertial>
+        <mass value="0.072"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+      </inertial>
+    </link>
+
+    <joint name="${name}_mount_to_link" type="fixed">
+      <parent link="${name}_mount"/>
+      <child link="${name}_link"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <!-- Optical frame: REP-103 (Z forward, X right, Y down) as ROS image conventions expect -->
+    <link name="${name}_optical_frame"/>
+    <joint name="${name}_link_to_optical" type="fixed">
+      <parent link="${name}_link"/>
+      <child link="${name}_optical_frame"/>
+      <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
+    </joint>
+
+    <gazebo reference="${name}_link">
+      <sensor name="${name}" type="rgbd_camera">
+        <always_on>true</always_on>
+        <update_rate>15</update_rate>
+        <visualize>true</visualize>
+        <topic>${name}</topic>
+        <gz_frame_id>${name}_optical_frame</gz_frame_id>
+        <camera>
+          <horizontal_fov>1.2043</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>8.0</far>
+          </clip>
+        </camera>
+      </sensor>
+    </gazebo>
+
+  </xacro:macro>
+</robot>

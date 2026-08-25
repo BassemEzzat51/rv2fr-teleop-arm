@@ -1,0 +1,53 @@
+controller_manager:
+  ros__parameters:
+    # Raised from 100 to 1000 Hz to match the physics step size (1ms, see
+    # rv2fr_gz_bringup/worlds/empty.sdf's <max_step_size>): every single launch this
+    # entire session has logged "Desired controller update period (0.01 s) is slower
+    # than the gazebo simulation period (0.001 s)" and it was never acted on. Traced a
+    # persistent, gain-independent, timestep-independent, self-collision-independent
+    # arm-at-rest oscillation directly to this: with a live joint-state trace, joints
+    # 1/4/5/6 were found bouncing between exactly two fixed positions every single
+    # sample, with velocity pinned EXACTLY at that joint's own URDF velocity limit each
+    # time (e.g. joint_6 alternating +12.5664/-12.5664 rad/s, exactly its 4*pi limit) --
+    # a textbook 10x update-rate-mismatch aliasing artifact between the position
+    # servo (computed once per 100Hz controller cycle) and physics integrating it over
+    # 10 physics steps before the next command arrives, worst on the lowest-inertia
+    # distal joints. See docs/decisions.md.
+    update_rate: 1000 # Hz
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    rv2fr_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    forward_position_controller:
+      type: forward_command_controller/ForwardCommandController
+
+rv2fr_controller:
+  ros__parameters:
+    joints:
+      - rv2fr_joint_1
+      - rv2fr_joint_2
+      - rv2fr_joint_3
+      - rv2fr_joint_4
+      - rv2fr_joint_5
+      - rv2fr_joint_6
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    state_publish_rate: 100.0
+    action_monitor_rate: 20.0
+
+forward_position_controller:
+  ros__parameters:
+    joints:
+      - rv2fr_joint_1
+      - rv2fr_joint_2
+      - rv2fr_joint_3
+      - rv2fr_joint_4
+      - rv2fr_joint_5
+      - rv2fr_joint_6
+    interface_name: position

@@ -1,0 +1,6 @@
+PyQt6>=6.5
+
+# ROS2 (Jazzy) dependencies are managed via rosdep/colcon, not pip:
+# rclpy, moveit_msgs, moveit_servo, tf2_ros, tf2_geometry_msgs,
+# geometry_msgs, sensor_msgs, trajectory_msgs, control_msgs,
+# ros_gz_sim, ros_gz_bridge, gz_ros2_control
